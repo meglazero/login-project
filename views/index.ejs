@@ -9,10 +9,30 @@
 </head>
 <body>
     <style>
+        window {
+            position: relative
+        }
+
         header {
             position: absolute;
-            top: 1em;
-            right: 1em;
+            top: .5em;
+            right: .5em;
+            height: 3em;
+            width: 6em;
+        }
+
+        .logged-in {
+            width: auto;
+        }
+
+        .hero {
+            margin: .5em 1em;
+            height: 3em;
+            max-width: calc(100vw - 6em);
+        }
+
+        .hero-log {
+            max-width: calc(100vw - 17em);
         }
 
         .container {
@@ -22,8 +42,63 @@
         .mr {
             margin-right: 1em;
         }
+
+        footer {
+            position: absolute;
+            bottom: .5em;
+            left: 1.5em;
+            right: 1.5em;
+            width: calc(100vw - 3em);
+            height: 3em;
+        }
+
+        .chat-form {
+            display: flex;
+        }
+
+        .chat-text {
+            flex: 1;
+            margin: 0 1em;
+        }
+
+        .chat-label {
+            margin-top: .5em;
+        }
+
+        .chat-box {
+            display: flex;
+        }
+
+        .dateTime {
+            margin-top: 1px;
+        }
+
+        .username {
+            color: #4340c5;
+            margin: 0 5px;
+            text-transform: capitalize;
+            font-weight: 600;
+        }
+
+        .message {
+            font-weight: 400;
+            color: #19271c
+        }
+
+        .scrollable {
+            height: calc(100vh - 9em);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column-reverse;
+            margin-top: 1em;
+        }
     </style>
-    <header>
+
+    <header
+        <% if (username != null) { %>
+            class="logged-in"
+        <% } %>
+        >
         <!-- set if variables to switch to log out if already logged in, store session data somewhere?-->
         <div class="container align-middle">
             <% if (username != null) { %>
@@ -40,10 +115,41 @@
             <% } %>
         </div>
     </header>
-    <div class="m-3 text-center">
-        <h1>Hello World</h1>
-        <hr>
-        <p>Chat/markdown section</p>
+
+    <div class="hero
+        <% if (username != null) { %>
+            hero-log
+        <% } %>
+        ">
+        <h1>Fancy chat</h1>
     </div>
+
+    <hr>
+
+    <div class="messagebody scrollable">
+        <% messages.forEach(message => { %>
+            <div class="card mt-2">
+                <div class="card-body chat-box">
+                    <div class="card-subtitle text-muted dateTime"><%= message.dateTime.getHours() %>:<%= message.dateTime.getMinutes() %></div>
+                    <div class="card-title username"><%= message.username %></div>
+                    <div class="card-text message"><%= message.message %></div>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+
+    <footer class="bottom">
+        <form action="/post" method="post" class="chat-form">
+            <label for="message" class="chat-label">Enter Message: </label>
+            <% if (username == null) { %>
+                <input disabled type="text" name="message" id="message" class="chat-text">
+                <button disabled type="submit" class="btn btn-success">Send</button>
+            <% } else { %>
+                <input type="text" name="message" id="message" class="chat-text" autofocus>
+                <button type="submit" class="btn btn-success">Send</button>
+            <% } %>
+        </form>
+    </footer>
+
 </body>
 </html>
