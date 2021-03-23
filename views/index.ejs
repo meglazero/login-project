@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Username Testing</title>
+</head>
+<body>
+    <style>
+        header {
+            position: absolute;
+            top: 1em;
+            right: 1em;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .mr {
+            margin-right: 1em;
+        }
+    </style>
+    <header>
+        <!-- set if variables to switch to log out if already logged in, store session data somewhere?-->
+        <div class="container align-middle">
+            <% if (username != null) { %>
+                <div class="mr pt-2">
+                    <div class="card-title">Hello <%= username %>!</div>
+                </div>
+                <form action="/logout" method="post">
+                    <button type="submit" class="btn btn-danger">Log out</button>
+                </form>
+            <% } else { %>
+                <form action="/login" method="get">
+                    <button type="submit" class="btn btn-primary">Log in</button>
+                </form>
+            <% } %>
+        </div>
+    </header>
+    <div class="m-3 text-center">
+        <h1>Hello World</h1>
+        <hr>
+        <p>Chat/markdown section</p>
+    </div>
+</body>
+</html>
