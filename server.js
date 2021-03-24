@@ -2,8 +2,10 @@ const express = require('express');
 const mongo = require('mongoose');
 const _userAuth = require('./models/userAuth');
 const _messages = require('./models/messages');
-const methodOverride = require('method-override');
-const user = { username: null };
+// const methodOverride = require('method-override');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+// const user = { username: null };
 
 const app = express();
 
@@ -12,25 +14,25 @@ mongo.connect('mongodb://localhost/userAuth,messages', {
     useNewUrlParser: true,
     useCreateIndex: true});
 
-// mongo.connect('mongodb://localhost/messages', {
-//     useUnifiedTopology: true,
-//     useNewUrlParser: true,
-//     useCreateIndex: true});
-
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: false }));
-app.use(methodOverride('_method'));
+app.use(cookieParser());
+app.use(session({
+    secret: "Tis a secret",
+    resave: true,
+    saveUninitialized: true
+}));
+// app.use(methodOverride('_method'));
 
 
 app.get('/', async (req, res) => {
     let messages = await _messages.find().sort( {
         dateTime: 'desc' });
-    // let messages = [{
-    //     username: 'test',
-    //     dateTime: Date.now(),
-    //     message: 'This is a way longer test message now to make sure it\'s not a distance thing although it shouldn\'t be anyway????'
-    // }]
-    res.render('index', { username: user.username, messages: messages });
+    res.render('index', { 
+        // username: user.username,
+        messages: messages,
+        username: req.session.username
+    });
 });
 
 app.get('/login', (req, res) => {
@@ -41,7 +43,8 @@ app.post('/login', async (req, res) => {
     try {
         let userAuth = await _userAuth.findOne({ username: req.body.username });
         if( userAuth.password == req.body.password) {
-            user.username = userAuth.username
+            // user.username = userAuth.username
+            req.session.username = userAuth.username
             res.render('success', { message: `${userAuth.username} log-in was successful!` });
         } else {
             console.log('password is incorrect');
@@ -58,9 +61,12 @@ app.post('/login', async (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-    if (user.username != null) {
-        let currentUser = user.username;
-        user.username = null;
+    // if (user.username != null) {
+    if (req.session.username != null) {
+        // let currentUser = user.username;
+        let currentUser = req.session.username;
+        // user.username = null;
+        req.session.username = null
         res.render('success', { message: `${currentUser} has been logged out` })
     }
 })
@@ -92,7 +98,8 @@ app.post('/create-account', async (req, res) => {
 
 app.post('/post', async (req, res) => {
     let userMessage = new _messages();
-    userMessage.username = user.username;
+    // userMessage.username = user.username;
+    userMessage.username = req.session.username;
     userMessage.message = req.body.message;
     console.log(`Posted: ${req.body.message}`);
     try {
